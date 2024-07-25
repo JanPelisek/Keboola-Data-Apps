@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from kbcstorage.client import Client
+# from kbcstorage.client import Client
 
 # Page Title
 st.write("# Data Entry")
@@ -12,10 +12,10 @@ with st.sidebar:
     st.page_link("pages/1_workers.py", label="Workers", icon="👷‍♂️")
     st.page_link("pages/2_projects.py", label="Projects", icon = "📂")
 
-kbcClientToken = st.secrets["kbc_storage_token"]
-kbcUrl = st.secrets["kbc_url"]
+# kbcClientToken = st.secrets["kbc_storage_token"]
+# kbcUrl = st.secrets["kbc_url"]
 
-client = Client(kbcUrl, kbcClientToken)
+# client = Client(kbcUrl, kbcClientToken)
 
 df = pd.read_csv("/data/in/table/Zapis-dat-d_worker")
 
