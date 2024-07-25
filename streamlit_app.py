@@ -17,6 +17,6 @@ with st.sidebar:
 
 # client = Client(kbcUrl, kbcClientToken)
 
-df = pd.read_csv("/data/in/table/Zapis-dat-d_worker")
+df = pd.read_csv("/data/in/table/Zapis-dat-d_worker.csv")
 
 st.dataframe(df)
