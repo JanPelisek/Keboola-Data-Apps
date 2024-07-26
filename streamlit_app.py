@@ -27,20 +27,17 @@ with st.form("Worker"):
     hire_date = st.date_input_input("Hire Date:",format="DD/MM/YYYY")
     salary = st.number_input("Salary:", min_value=0)
     fte = st.number_input("FTE:",min_value=0, max_value=1.4, format="%0.1f")
-    type = st.selectbox(
-        "Type:",
-        ["IČO", "Full-time", "Part-Time"]
-    )
+    type = st.selectbox("Type:", ["IČO", "Full-time", "Part-Time"])
     email = st.text_input("Email:")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        new_record = st.form_submit_button("New",on_click=Add_new_record )
-    with col2:
-        search_record = st.form_submit_button("Search")
-    with col3:
-        update_record = st.form_submit_button("Update")
-    with col4:
-        clear_form = st.form_submit_button("Clear")
+    #col1, col2, col3, col4 = st.columns(4)
+    #with col1:
+    new_record = st.form_submit_button("New",on_click=Add_new_record )
+    #with col2:
+    search_record = st.form_submit_button("Search")
+    #with col3:
+    update_record = st.form_submit_button("Update")
+    #with col4:
+    clear_form = st.form_submit_button("Clear")
 
 
 st.dataframe(df)
