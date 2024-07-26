@@ -16,4 +16,24 @@ kbc = KeboolaStreamlit("https://connection.north-europe.azure.keboola.com/", st.
 if st.session_state.get("data") is None:
     st.session_state["data"] = kbc.read_table('in.c-keboola-ex-google-drive-81159909.Zapis-dat-d_worker')
 
-st.write(st.session_state["data"])
+df = st.session_state["data"]
+
+
+with st.form("Worker"):
+    st.write("Worker data entry form")
+    name = st.text_input("Name:")
+    hire_date = st.text_input("Hire Date:")
+    salary = st.number_input("Salary:")
+    FTE = st.number_input("FTE:")
+    type = st.selectbox(
+        "Type:",
+        ["IČO", "Full-time", "Part-Time"]
+    )
+    email = st.text_input("Email:")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.button("New")
+    col2.button("Search")
+    col3.button("Update")
+    col4.button("Clear")
+    
+st.dataframe(df)
