@@ -31,9 +31,13 @@ with st.form("Worker"):
     )
     email = st.text_input("Email:")
     col1, col2, col3, col4 = st.columns(4)
-    col1.button("New")
-    col2.button("Search")
-    col3.button("Update")
-    col4.button("Clear")
-    
+    with col1:
+        new_record = st.form_submit_button("New")
+    with col2:
+        search_record = st.form_submit_button("Search")
+    with col3:
+        update_record = st.submit_button("Update")
+    with col4:
+        clear_form = st.submit_button("Clear")
+
 st.dataframe(df)
