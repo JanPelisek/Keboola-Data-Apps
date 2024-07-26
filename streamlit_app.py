@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-# from kbcstorage.client import Client
-
+from keboola_streamlit import KeboolaStreamlit
 # Page Title
 st.write("# Data Entry")
 st.write("You can enter data on this page")
@@ -12,11 +11,9 @@ with st.sidebar:
     st.page_link("pages/1_workers.py", label="Workers", icon="👷‍♂️")
     st.page_link("pages/2_projects.py", label="Projects", icon = "📂")
 
-# kbcClientToken = st.secrets["kbc_storage_token"]
-# kbcUrl = st.secrets["kbc_url"]
+kbc = KeboolaStreamlit("https://connection.north-europe.azure.keboola.com/", st.secrets["API_TOKEN"])
 
-# client = Client(kbcUrl, kbcClientToken)
+if st.session_state.get("data") is None:
+    st.session_state["data"] = kbc.read_table('in.GoogleDrive.Zapis-dat-d_worker')
 
-df = pd.read_csv("/data/in/table/Zapis-dat-d_worker.csv")
-
-st.dataframe(df)
+st.write(st.session_state["data"])
