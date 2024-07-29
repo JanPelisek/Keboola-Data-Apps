@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from keboola_streamlit import KeboolaStreamlit
-import datetime
+from datetime import date
 # Page Title
 st.write("# Data Entry")
 st.write("You can enter data on this page")
@@ -20,10 +20,35 @@ if st.session_state.get("data") is None:
     st.session_state["data"] = kbc.read_table('in.c-keboola-ex-google-drive-81159909.Zapis-dat-d_worker')
 df = st.session_state["data"]
 
+if 'df' not in st.session_state:
+    st.session_state['df'] = df
+
 # Define data manipuation actions
-def Add_new_record():
+def add_new_record(df):
+    emp_records = df[df['worker_email'] == st.session_state['worker_email']]
+    old_record_index = emp_records[emp_records['is_current'] == 'Y'].index
+    df.loc[old_record_index, 'is_current'] = 'N'
+    df.loc[old_record_index, 'effective_end_date'] = date.today()
+    new_record = pd.DataFrame({
+        "worker_name" :             st.session_state["worker_name"],
+        "worker_hire_date":         st.session_state["worker_hire_date"],
+        "worker_salary":            st.session_state["worker_salary"],
+        "worker_FTE":               st.session_state["worker_FTE"],
+        "worker_type":              st.session_state["worker_type"],
+        "worker_email":             st.session_state["worker_email"],
+        "worker_hr_id":             df.loc[old_record_index, 'worker_hr_id'],
+        "effective_start_date":     date.today(),
+        "effective_end_date":       date(2100, 12, 31),
+        "is_current":               ['Y']
+    })
+    df = pd.concat([df,new_record], ignore_index=True)
+    st.session_state['df'] = df
+    st.session_state["new_record"] = False
+    return df
+
+def add_new_record_confirmation():
     st.write("Are you sure you want to add this record?")
-    new_record = pd.DataFrame(
+    check_record = pd.DataFrame(
         [{
            "worker_name" :      st.session_state["worker_name"],
            "worker_hire_date":  st.session_state["worker_hire_date"],
@@ -33,36 +58,52 @@ def Add_new_record():
            "worker_email":      st.session_state["worker_email"]
         }]
     )
-    st.write(new_record)
-    col1, col2 = st.columns([0.1,0.7])
-    col1.form_submit_button("Submit")
-    col2.form_submit_button("Cancel")
+    st.dataframe(check_record)
 
+    if "confirmed" not in st.session_state:
+        st.session_state["confirmed"] = False
+
+    col1, col2 = st.columns([0.1,0.7])
+    if col1.form_submit_button("Submit"):
+        st.session_state["confirmed"] = True
+
+    if col2.form_submit_button("Cancel"):
+        st.session_state["confirmed"] = False
+
+    if st.session_state["confirmed"]:
+        st.session_state['df']= add_new_record(st.session_state['df'])
+        st.session_state["confirmed"] = False
+        for key in ["worker_name", "worker_hire_date", "worker_salary", "worker_FTE", "worker_type", "worker_email"]:
+            st.session_state.pop(key, None)
+        st.experimental_rerun()
+    
+
+# Define from manipulation actions
 def clear_form():
-    st.session_state['name'] = ''
-    st.session_state['hire_date']= datetime.date(2024,1,1)
+    st.session_state['worker_name'] = ''
+    st.session_state['hire_date']= date(2024,1,1)
     st.session_state['salary'] = 0
     st.session_state['fte'] = 0.0
     st.session_state['type'] = ''
     st.session_state['email'] = ''
 
-if 'name' not in st.session_state:
-    st.session_state['name']=''
+if 'worker_name' not in st.session_state:
+    st.session_state['worker_name']=''
 
-if 'hire_date' not in st.session_state:
-    st.session_state['hire_date']=datetime.date(2024,1,1)
+if 'worker_hire_date' not in st.session_state:
+    st.session_state['worker_hire_date']=date(2024,1,1)
 
-if 'salary' not in st.session_state:
-    st.session_state['salary']=0
+if 'worker_salary' not in st.session_state:
+    st.session_state['worker_salary']=0
 
-if 'fte' not in st.session_state:
-    st.session_state['fte']=float('0')
+if 'worker_fte' not in st.session_state:
+    st.session_state['worker_fte']=float('0')
 
-if 'type' not in st.session_state:
-    st.session_state['type']=''
+if 'worker_type' not in st.session_state:
+    st.session_state['worker_type']=''
 
-if 'email' not in st.session_state:
-    st.session_state['email']=''
+if 'worker_email' not in st.session_state:
+    st.session_state['worker_email']=''
 
 tab1, tab2 =st.tabs(["📝 Data Entry Form", "📊Data"])
 
@@ -88,12 +129,18 @@ with tab1:
             clear_input = st.form_submit_button("Clear")
 
         # Run data manipulation actions
-        if new_record:
-            Add_new_record()
+        if "new_record" not in st.session_state:
+            st.session_state["new_record"] = False
 
-if clear_input:
-    clear_form()
+        if new_record:
+            st.session_state["new_record"] = True
+            if st.session_state["new_record"]:
+                add_new_record_confirmation()
+
+        if clear_input:
+            clear_form()
+
 
 # Display the dataframe
 with tab2:
-    st.dataframe(df)
+    st.data_editor(st.session_state['df'])
