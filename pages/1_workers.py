@@ -9,3 +9,6 @@ with st.sidebar:
     st.page_link("pages/1_workers.py", label="Workers", icon="👷‍♂️")
     st.page_link("pages/2_projects.py", label="Projects", icon = "📂")
 
+
+    
+
