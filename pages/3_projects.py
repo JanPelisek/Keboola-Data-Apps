@@ -4,6 +4,7 @@ import pyarrow as pa
 import datetime as dt
 from keboola_streamlit import KeboolaStreamlit
 st.write("# Projects Entry Form")
+df = st.session_state['data']
 
 with st.sidebar:
     st.page_link("streamlit_app.py", label="Home", icon = "🏠")
