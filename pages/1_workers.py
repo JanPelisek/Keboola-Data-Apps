@@ -4,13 +4,15 @@ import pyarrow as pa
 import datetime as dt
 from keboola_streamlit import KeboolaStreamlit
 st.write("# Workers Entry Form")
-df = st.session_state['data']
+df = st.session_state['worker_data']
 
 with st.sidebar:
     st.page_link("streamlit_app.py", label="Home", icon = "🏠")
     st.page_link("pages/1_workers.py", label="Workers", icon="👷‍♂️")
     st.page_link("pages/2_accounts.py", label = "Accounts", icon="💼")
     st.page_link("pages/3_projects.py", label="Projects", icon = "📂")
+    st.page_link("pages/4_orders.py", label="Orders", icon="🧾")
+
 
 # Tabs for data entry and data display
 tab1, tab2, tab3 = st.tabs(["📝 Add new or update old records","❌ Delete records", "📊 Data"])
@@ -49,7 +51,7 @@ with tab1:
                 "effective_end_date":       pd.Timestamp('2100-12-31').date(),
                 "is_current":               'Y'
             }])
-            st.session_state['data'] = pd.concat([df, new_record], ignore_index=True)
+            st.session_state['worker_data'] = pd.concat([df, new_record], ignore_index=True)
             st.success("New record has been added", icon="✔")
 
 with tab2:
@@ -71,7 +73,7 @@ with tab2:
             if (worker_name_del == '') & (worker_email_del == ''):
                 st.warning("You have not selected any records", icon="‼") 
             else:
-                df = st.session_state['data']
+                df = st.session_state['worker_data']
                 if df.loc[df['worker_name'] == worker_name_del, 'worker_hr_id'].empty:
                     st.error("The record you are looking for doesn't exist or doesn't have a unique identified. Please check your input or search directly in the data tab.", icon="💣")
                 else:
@@ -94,7 +96,7 @@ with tab2:
             if (worker_name_del == '') & (worker_email_del == ''):
                 st.warning("You have not selected any records", icon="‼")
             else:
-                df = st.session_state['data']
+                df = st.session_state['worker_data']
                 hr_id = df.loc[df['worker_name'] == worker_name_del, 'worker_hr_id'].values[0]
                 indexHrId = df[df['worker_hr_id'] == hr_id].index
                 df_new = df.drop(indexHrId) # in production add parameter inplace=True
@@ -105,7 +107,7 @@ with tab2:
             if (worker_name_del == '') & (worker_email_del == ''):
                 st.warning("You have not selected any records", icon="‼")
             else:
-                df = st.session_state['data']
+                df = st.session_state['worker_data']
                 hr_id = df.loc[df['worker_name'] == worker_name_del, 'worker_hr_id'].values[0]
                 latest_active = df[(df['is_current'] == 'Y') & (df['worker_hr_id'] == hr_id)].index
                 inactive_df = df[(df['worker_hr_id'] == hr_id) & (df['is_current'] == 'N')].sort_values(by='effective_end_date', ascending=False)
@@ -158,12 +160,11 @@ with tab3:
              ## Data
              On this page you can view and edit the date directly in the table bellow.
              """)
-    edited_df = st.data_editor(st.session_state['data'], width=2000, use_container_width=False, num_rows="dynamic")
+    edited_df = st.data_editor(st.session_state['worker_data'], width=2000, use_container_width=False, num_rows="dynamic")
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
         if st.button("Save changes"):
-            st.session_state['data'] = edited_df
+            st.session_state['worker_data'] = edited_df
     with col2:
         if st.button("Abort changes"):
-            st.write("duh..")
-    
+            st.write("duh.. not yet supported")
